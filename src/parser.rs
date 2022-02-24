@@ -17,17 +17,17 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Expr {
-        let expr = self.parse_expression(0);
-        self.curr_tok = self.scanner.scan();
+        let expr = self.parse_expression(MIN_BINDING_POWER);
         if self.curr_tok.kind != TokenType::Eof {
-            panic!("Expected for find Eof, found {}", self.curr_tok);
+            panic!("Expected to find Eof, found {}", self.curr_tok);
         }
         expr
     }
 
     fn parse_expression(&mut self, rbp: i32) -> Expr {
-        let mut left = self.nud(self.curr_tok.clone());
+        let tok = self.curr_tok.clone();
         self.curr_tok = self.scanner.scan();
+        let mut left = self.nud(tok);
 
         while rbp < Parser::lbp(self.curr_tok.kind) {
             let tok = self.curr_tok.clone();
@@ -65,16 +65,15 @@ impl Parser {
         match tok.kind {
             TokenType::Number => Expr::IntLit(tok.spelling.trim().parse::<i64>().unwrap()),
             TokenType::LParen => {
-                self.curr_tok = self.scanner.scan();
-                let expr = self.parse_expression(0);
+                let expr = self.parse_expression(MIN_BINDING_POWER);
                 if self.curr_tok.kind != TokenType::RParen {
                     panic!("Missing parens");
                 }
+                self.curr_tok = self.scanner.scan();
                 expr
             }
             TokenType::Plus | TokenType::Minus => {
                 let kind = tok.kind;
-                self.curr_tok = self.scanner.scan();
                 Expr::UnaryExpr(kind, Box::new(self.parse_expression(MAX_BINDING_POWER)))
             }
             _ => panic!("Invalid token for nud {}", tok),

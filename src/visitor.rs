@@ -1,3 +1,5 @@
+use super::ast::Expr;
+
 pub trait Visitor<T> {
-    fn visit_expr(e: &Expr) -> T;
+    fn visit_expr(&mut self, e: &Expr) -> T;
 }

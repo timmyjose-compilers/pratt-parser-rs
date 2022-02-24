@@ -1,3 +1,4 @@
+use pratt_parser_rs::evaluator::Evaluator;
 use pratt_parser_rs::parser::Parser;
 use pratt_parser_rs::scanner::Scanner;
 
@@ -16,5 +17,7 @@ fn main() {
 
     let mut parser = Parser::new(Scanner::new(get_input()));
     let ast = parser.parse();
-    println!("{}", ast);
+
+    let mut evaluator = Evaluator;
+    println!("{}", evaluator.evaluate(&ast));
 }
